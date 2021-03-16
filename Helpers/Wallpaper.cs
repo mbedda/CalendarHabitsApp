@@ -99,10 +99,10 @@ namespace CalendarHabitsApp.Helpers
             };
 
             System.IO.Directory.CreateDirectory("output");
-            using (Image<Rgba32> img1 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "base.png"))) // load up source images
-            using (Image<Rgba32> img2 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "highlight.png")))
-            using (Image<Rgba32> img3 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-dark.png")))
-            using (Image<Rgba32> img4 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-light.png")))
+            using (Image<Rgba32> img1 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "base-dark.png"))) // load up source images
+            using (Image<Rgba32> img2 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "highlight-dark.png")))
+            using (Image<Rgba32> img3 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-dark-dark.png")))
+            using (Image<Rgba32> img4 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-light-dark.png")))
             using (Image<Rgba32> outputImage = new Image<Rgba32>(img1.Width, img1.Height)) // create output image of the correct dimensions
             {
                 // take the 2 source images and draw them onto the image
@@ -123,11 +123,11 @@ namespace CalendarHabitsApp.Helpers
                         float posx = startx + ((j + 1) - 1) * cellw + ((j + 1) * cellborder) + (cellw / 2 - textw / 2);
                         float posy = starty - 15 + ((i + 1) - 1) * cellh + ((i + 1) * cellborder) + (cellh / 2 - texth / 2);
 
-                        Color textcolor = Color.FromRgb(31, 31, 31);
+                        Color textcolor = Color.FromRgb(236, 235, 220);
 
                         if (!monthDays[(i * 7) + j].FromCurrentMonth)
                         {
-                            textcolor = Color.FromRgb(236, 235, 220);
+                            textcolor = Color.FromRgb(77, 74, 74);
                         }
 
                         outputImage.Mutate(x => x.DrawText(monthDays[(i * 7) + j].Date.Day.ToString("D2"), numbersFont, textcolor, new PointF(posx, posy)));
@@ -179,7 +179,7 @@ namespace CalendarHabitsApp.Helpers
                 });
 
                 outputImage.Mutate(ctx => ctx
-                    .Fill(Color.FromRgb(31, 31, 31), glyphs));
+                    .Fill(Color.FromRgb(236, 235, 220), glyphs));
 
                 /////////////////////
 
@@ -211,7 +211,7 @@ namespace CalendarHabitsApp.Helpers
                 });
 
                 outputImage.Mutate(ctx => ctx
-                    .Fill(Color.FromRgb(31, 31, 31), glyphs2));
+                    .Fill(Color.FromRgb(236, 235, 220), glyphs2));
 
                 /////////////////////
 
