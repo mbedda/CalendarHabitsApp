@@ -1,13 +1,24 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CalendarHabitsApp.Models
 {
-    public class HabitDay
+    public class HabitDay : BindableBase
     {
-        public DateTime Date { get; set; }
+        private DateTime _date;
+        public DateTime Date
+        {
+            get { return _date; }
+            set { SetProperty(ref _date, value); }
+        }
 
-        public bool Checked { get; set; }
+        private bool _checked;
+        public bool Checked
+        {
+            get { return _checked; }
+            set { SetProperty(ref _checked, value); }
+        }
     }
 }

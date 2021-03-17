@@ -33,17 +33,18 @@ namespace CalendarHabitsApp.Helpers
             Stretched
         }
 
-        public static void Set(Uri uri, Style style, int cellx, int celly, int year, DateTime currentDate, List<MonthDay> monthDays, List<DateTime> HabitDays)
+        public static void CreateCalendar(DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
         {
-            //System.IO.Stream s = new System.Net.WebClient().OpenRead(uri.ToString());
-            Highlight(cellx, celly, year, currentDate, monthDays, HabitDays);
-            //System.Drawing.Image img = System.Drawing.Image.FromStream(s);
-            string tempPath = IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "output.png");
-            //img.Save(tempPath, Imaging.ImageFormat.Bmp);
-            //if(flag)
-            //    tempPath = "D:/Work/Calendar.png";
+            CreateImage(currentDate, currentDateCell, selectedMonthDays, habitDays);
 
+            Set(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.png"));
+        }
+
+        public static void Set(string path)
+        {
+            Style style = Wallpaper.Style.Centered;
             RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
+
             if (style == Style.Stretched)
             {
                 key.SetValue(@"WallpaperStyle", 2.ToString());
@@ -64,28 +65,22 @@ namespace CalendarHabitsApp.Helpers
 
             SystemParametersInfo(SPI_SETDESKWALLPAPER,
                 0,
-                tempPath,
+                path,
                 SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
         }
 
-        public static void Highlight(int requiredcellx, int requiredcelly, int year, DateTime currentDate, List<MonthDay> monthDays, List<DateTime> HabitDays)
+        public static void CreateImage(DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
         {
-            int startx = 344;
-            int starty = 145;
-            int cellw = 175;
-            int cellh = 176;
-            int cellborder = 1;
-
-            int highlightwh = 140;
-
-            int crossoutw = 109;
-            int crossouth = 104;
+            //Init
+            //
+            CalendarVariables calVars = new CalendarVariables();
 
             int textw = 89;
             int texth = 70;
 
             FontCollection collection = new FontCollection();
             FontFamily family = collection.Install(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "Fonts", "OldStandard-Bold.ttf"));
+            
             Font numbersFont = family.CreateFont(75, FontStyle.Italic);
             RendererOptions numbersFontOptions = new RendererOptions(numbersFont, dpi: 72)
             {
@@ -99,65 +94,73 @@ namespace CalendarHabitsApp.Helpers
             };
 
             System.IO.Directory.CreateDirectory("output");
-            using (Image<Rgba32> img1 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "base-dark.png"))) // load up source images
-            using (Image<Rgba32> img2 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "highlight-dark.png")))
-            using (Image<Rgba32> img3 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-dark-dark.png")))
-            using (Image<Rgba32> img4 = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-light-dark.png")))
-            using (Image<Rgba32> outputImage = new Image<Rgba32>(img1.Width, img1.Height)) // create output image of the correct dimensions
+            using (Image<Rgba32> baseImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "base-dark.png"))) // load up source images
+            using (Image<Rgba32> highlightImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "highlight-dark.png")))
+            using (Image<Rgba32> crossoutImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-dark-dark.png")))
+            using (Image<Rgba32> crossoutDisabledImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-light-dark.png")))
+            using (Image<Rgba32> outputImage = new Image<Rgba32>(baseImage.Width, baseImage.Height)) // create output image of the correct dimensions
             {
-                // take the 2 source images and draw them onto the image
+                #region Highlight current day on calendar
+                //Highlight current day on calendar
+                //
+                Point highlightPosition = new Point(
+                    calVars.canvasStartX + (currentDateCell.X - 1) * calVars.calendarCellW 
+                    + (currentDateCell.X * calVars.calendarCellBorder)
+                     + (calVars.calendarCellW / 2 - calVars.currentDayHighlightImageW / 2), 
+                     calVars.canvasStartY + (currentDateCell.Y - 1) * calVars.calendarCellH 
+                     + (currentDateCell.Y * calVars.calendarCellBorder)
+                     + (calVars.calendarCellH / 2 - calVars.currentDayHighlightImageH / 2));
+
                 outputImage.Mutate(o => o
-                    .DrawImage(img1, new Point(0, 0), 1f) // draw the first one top left
-                    .DrawImage(img2, new Point(startx + (requiredcellx - 1) * cellw + (requiredcellx * cellborder)
-                     + (cellw / 2 - highlightwh / 2), starty + (requiredcelly - 1) * cellh + (requiredcelly * cellborder) 
-                     + (cellh / 2 - highlightwh / 2)), 1f) // draw the second next to it
+                    .DrawImage(baseImage, new Point(0, 0), 1f)
+                    .DrawImage(highlightImage, highlightPosition, 1f)
                 );
+                #endregion
 
-                //FontRectangle fontrect = TextMeasurer.Measure("01", numbersFontOptions);
-
-                
+                #region Draw Calendar numbers
+                //Draw Calendar numbers
+                //
                 for (int i = 0; i < 5; i++)
                 {
                     for (int j = 0; j < 7; j++)
                     {
-                        float posx = startx + ((j + 1) - 1) * cellw + ((j + 1) * cellborder) + (cellw / 2 - textw / 2);
-                        float posy = starty - 15 + ((i + 1) - 1) * cellh + ((i + 1) * cellborder) + (cellh / 2 - texth / 2);
+                        float posx = calVars.canvasStartX + ((j + 1) - 1) * calVars.calendarCellW + ((j + 1) * calVars.calendarCellBorder) + (calVars.calendarCellW / 2 - textw / 2);
+                        float posy = calVars.canvasStartY - 15 + ((i + 1) - 1) * calVars.calendarCellH + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
 
                         Color textcolor = Color.FromRgb(236, 235, 220);
 
-                        if (!monthDays[(i * 7) + j].FromCurrentMonth)
+                        if (!selectedMonthDays[(i * 7) + j].FromCurrentMonth)
                         {
                             textcolor = Color.FromRgb(77, 74, 74);
                         }
 
-                        outputImage.Mutate(x => x.DrawText(monthDays[(i * 7) + j].Date.Day.ToString("D2"), numbersFont, textcolor, new PointF(posx, posy)));
+                        outputImage.Mutate(x => x.DrawText(selectedMonthDays[(i * 7) + j].Date.Day.ToString("D2"), numbersFont, textcolor, new PointF(posx, posy)));
 
-                        var habitDay = HabitDays.FindIndex(s => s.ToString("MM/dd/yyyy") == monthDays[(i * 7) + j].Date.ToString("MM/dd/yyyy"));
+                        //Crossout completed habit days
+                        //
+                        var habitDay = habitDays.FindIndex(s => s.ToString("MM/dd/yyyy") == selectedMonthDays[(i * 7) + j].Date.ToString("MM/dd/yyyy"));
                         if (habitDay != -1)
                         {
-                            int posx2 = startx - 10 + ((j + 1) - 1) * cellw + ((j + 1) * cellborder) + (cellw / 2 - textw / 2);
-                            int posy2 = starty - 15 + ((i + 1) - 1) * cellh + ((i + 1) * cellborder) + (cellh / 2 - texth / 2);
+                            int posx2 = calVars.canvasStartX - 10 + ((j + 1) - 1) * calVars.calendarCellW + ((j + 1) * calVars.calendarCellBorder) + (calVars.calendarCellW / 2 - textw / 2);
+                            int posy2 = calVars.canvasStartY - 15 + ((i + 1) - 1) * calVars.calendarCellH + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
 
-                            if (monthDays[(i * 7) + j].FromCurrentMonth)
+                            if (selectedMonthDays[(i * 7) + j].FromCurrentMonth)
                             {
-                                outputImage.Mutate(x => x.DrawImage(img3, new Point(posx2, posy2), 1f));
+                                outputImage.Mutate(x => x.DrawImage(crossoutImage, new Point(posx2, posy2), 1f));
                             }
                             else
                             {
-                                outputImage.Mutate(x => x.DrawImage(img4, new Point(posx2, posy2), 1f));
+                                outputImage.Mutate(x => x.DrawImage(crossoutDisabledImage, new Point(posx2, posy2), 1f));
                             }
                         }
                     }
                 }
+                #endregion
 
-               
-
-                /////////////////
-                ///
-
-
+                #region Draw month name text
+                //Draw month name text
+                //
                 PathBuilder pathBuilder = new PathBuilder();
-                //pathBuilder.SetOrigin(new PointF(500, 0));
                 pathBuilder.AddLine(new PointF(1930, 1008), new PointF(1930, 73));
 
                 IPath path = pathBuilder.Build();
@@ -169,7 +172,7 @@ namespace CalendarHabitsApp.Helpers
                     }
                 };
 
-                var glyphs = TextBuilder.GenerateGlyphs(currentDate.ToString("MMMM").ToUpper(), path, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
+                var glyphs = TextBuilder.GenerateGlyphs(Common.GetMonthNameFromNumber(currentDate.Month).ToUpper(), path, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
                 {
                     HorizontalAlignment = textGraphicsOptions.TextOptions.HorizontalAlignment,
                     TabWidth = textGraphicsOptions.TextOptions.TabWidth,
@@ -180,16 +183,13 @@ namespace CalendarHabitsApp.Helpers
 
                 outputImage.Mutate(ctx => ctx
                     .Fill(Color.FromRgb(236, 235, 220), glyphs));
-
-                /////////////////////
-
-
-                /////////////////
-                ///
+                #endregion
 
 
+                #region Draw year text
+                //Draw year text
+                //
                 PathBuilder pathBuilder2 = new PathBuilder();
-                //pathBuilder.SetOrigin(new PointF(500, 0));
                 pathBuilder2.AddLine(new PointF(-10, 267), new PointF(-10, 829));
 
                 IPath path2 = pathBuilder2.Build();
@@ -201,7 +201,7 @@ namespace CalendarHabitsApp.Helpers
                     }
                 };
 
-                var glyphs2 = TextBuilder.GenerateGlyphs(year.ToString(), path2, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
+                var glyphs2 = TextBuilder.GenerateGlyphs(currentDate.Year.ToString(), path2, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
                 {
                     HorizontalAlignment = textGraphicsOptions.TextOptions.HorizontalAlignment,
                     TabWidth = textGraphicsOptions.TextOptions.TabWidth,
@@ -212,10 +212,10 @@ namespace CalendarHabitsApp.Helpers
 
                 outputImage.Mutate(ctx => ctx
                     .Fill(Color.FromRgb(236, 235, 220), glyphs2));
+                #endregion
 
-                /////////////////////
-
-
+                //Save output image
+                //
                 outputImage.Save("output.png");
             }
         }
