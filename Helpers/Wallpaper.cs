@@ -33,9 +33,25 @@ namespace CalendarHabitsApp.Helpers
             Stretched
         }
 
-        public static void CreateCalendar(DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
+        public static Color color1Light = Color.FromRgb(31, 31, 31);
+        public static Color color2Light = Color.FromRgb(236, 235, 220);
+        public static Color color3Light = Color.FromRgb(236, 235, 220);
+        public static String baseImageLight = "base.png";
+        public static String highlightLight = "highlight.png";
+        public static String crossoutLight = "x-dark.png";
+        public static String crossoutDimmedLight = "x-light.png";
+
+        public static Color color1Dark = Color.FromRgb(236, 235, 220);
+        public static Color color2Dark = Color.FromRgb(236, 235, 220);
+        public static Color color3Dark = Color.FromRgb(77, 74, 74);
+        public static String baseImageFileDark = "base-dark.png";
+        public static String highlightFileDark = "highlight-dark.png";
+        public static String crossoutFileDark = "x-dark-dark.png";
+        public static String crossoutDimmedFileDark = "x-light-dark.png";
+
+        public static void CreateCalendar(bool darkMode, DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
         {
-            CreateImage(currentDate, currentDateCell, selectedMonthDays, habitDays);
+            CreateImage(darkMode, currentDate, currentDateCell, selectedMonthDays, habitDays);
 
             Set(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.png"));
         }
@@ -69,8 +85,32 @@ namespace CalendarHabitsApp.Helpers
                 SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
         }
 
-        public static void CreateImage(DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
+        public static void CreateImage(bool darkMode, DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
         {
+            Color color1, color2, color3;
+            String baseImageFile, highlightFile, crossoutFile, crossoutDimmedFile;
+
+            if (darkMode)
+            {
+                color1 = color1Dark;
+                color2 = color2Dark;
+                color3 = color3Dark;
+                baseImageFile = baseImageFileDark;
+                highlightFile = highlightFileDark;
+                crossoutFile = crossoutFileDark;
+                crossoutDimmedFile = crossoutDimmedFileDark;
+            }
+            else
+            {
+                color1 = color1Light;
+                color2 = color2Light;
+                color3 = color3Light;
+                baseImageFile = baseImageLight;
+                highlightFile = highlightLight;
+                crossoutFile = crossoutLight;
+                crossoutDimmedFile = crossoutDimmedLight;
+            }
+
             //Init
             //
             CalendarVariables calVars = new CalendarVariables();
@@ -80,7 +120,7 @@ namespace CalendarHabitsApp.Helpers
 
             FontCollection collection = new FontCollection();
             FontFamily family = collection.Install(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "Fonts", "OldStandard-Bold.ttf"));
-            
+
             Font numbersFont = family.CreateFont(75, FontStyle.Italic);
             RendererOptions numbersFontOptions = new RendererOptions(numbersFont, dpi: 72)
             {
@@ -94,20 +134,20 @@ namespace CalendarHabitsApp.Helpers
             };
 
             System.IO.Directory.CreateDirectory("output");
-            using (Image<Rgba32> baseImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "base-dark.png"))) // load up source images
-            using (Image<Rgba32> highlightImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "highlight-dark.png")))
-            using (Image<Rgba32> crossoutImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-dark-dark.png")))
-            using (Image<Rgba32> crossoutDisabledImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "x-light-dark.png")))
+            using (Image<Rgba32> baseImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", baseImageFile))) // load up source images
+            using (Image<Rgba32> highlightImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", highlightFile)))
+            using (Image<Rgba32> crossoutImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", crossoutFile)))
+            using (Image<Rgba32> crossoutDisabledImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", crossoutDimmedFile)))
             using (Image<Rgba32> outputImage = new Image<Rgba32>(baseImage.Width, baseImage.Height)) // create output image of the correct dimensions
             {
                 #region Highlight current day on calendar
                 //Highlight current day on calendar
                 //
                 Point highlightPosition = new Point(
-                    calVars.canvasStartX + (currentDateCell.X - 1) * calVars.calendarCellW 
+                    calVars.canvasStartX + (currentDateCell.X - 1) * calVars.calendarCellW
                     + (currentDateCell.X * calVars.calendarCellBorder)
-                     + (calVars.calendarCellW / 2 - calVars.currentDayHighlightImageW / 2), 
-                     calVars.canvasStartY + (currentDateCell.Y - 1) * calVars.calendarCellH 
+                     + (calVars.calendarCellW / 2 - calVars.currentDayHighlightImageW / 2),
+                     calVars.canvasStartY + (currentDateCell.Y - 1) * calVars.calendarCellH
                      + (currentDateCell.Y * calVars.calendarCellBorder)
                      + (calVars.calendarCellH / 2 - calVars.currentDayHighlightImageH / 2));
 
@@ -127,11 +167,11 @@ namespace CalendarHabitsApp.Helpers
                         float posx = calVars.canvasStartX + ((j + 1) - 1) * calVars.calendarCellW + ((j + 1) * calVars.calendarCellBorder) + (calVars.calendarCellW / 2 - textw / 2);
                         float posy = calVars.canvasStartY - 15 + ((i + 1) - 1) * calVars.calendarCellH + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
 
-                        Color textcolor = Color.FromRgb(236, 235, 220);
+                        Color textcolor = color1;
 
                         if (!selectedMonthDays[(i * 7) + j].FromCurrentMonth)
                         {
-                            textcolor = Color.FromRgb(77, 74, 74);
+                            textcolor = color3;
                         }
 
                         outputImage.Mutate(x => x.DrawText(selectedMonthDays[(i * 7) + j].Date.Day.ToString("D2"), numbersFont, textcolor, new PointF(posx, posy)));
@@ -182,7 +222,7 @@ namespace CalendarHabitsApp.Helpers
                 });
 
                 outputImage.Mutate(ctx => ctx
-                    .Fill(Color.FromRgb(236, 235, 220), glyphs));
+                    .Fill(color1, glyphs));
                 #endregion
 
 
@@ -211,7 +251,7 @@ namespace CalendarHabitsApp.Helpers
                 });
 
                 outputImage.Mutate(ctx => ctx
-                    .Fill(Color.FromRgb(236, 235, 220), glyphs2));
+                    .Fill(color1, glyphs2));
                 #endregion
 
                 //Save output image

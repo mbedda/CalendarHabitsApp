@@ -34,18 +34,18 @@ namespace CalendarHabitsApp.UserControls
 
             if (mDay.Checked)
             {
-                var habitDay = mainWindow.viewModel.HabitDays.ToList().FindIndex(s => s.ToString("MM/dd/yyyy") == mDay.Date.ToString("MM/dd/yyyy"));
+                var habitDay = mainWindow.viewModel.Settings.HabitDays.ToList().FindIndex(s => s.ToString("MM/dd/yyyy") == mDay.Date.ToString("MM/dd/yyyy"));
                 if (habitDay == -1)
                 {
-                    mainWindow.viewModel.HabitDays.Add(mDay.Date);
+                    mainWindow.viewModel.Settings.HabitDays.Add(mDay.Date);
                 }
             }
             else
             {
-                var habitDay = mainWindow.viewModel.HabitDays.ToList().FindIndex(s => s.ToString("MM/dd/yyyy") == mDay.Date.ToString("MM/dd/yyyy"));
+                var habitDay = mainWindow.viewModel.Settings.HabitDays.ToList().FindIndex(s => s.ToString("MM/dd/yyyy") == mDay.Date.ToString("MM/dd/yyyy"));
                 if (habitDay != -1)
                 {
-                    mainWindow.viewModel.HabitDays.RemoveAt(habitDay);
+                    mainWindow.viewModel.Settings.HabitDays.RemoveAt(habitDay);
                 }
             }
         }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -63,6 +64,30 @@ namespace CalendarHabitsApp
                     Application.Current.MainWindow.ShowInTaskbar = true;
                     break;
             }
+        }
+
+        private void chkStartUp_Checked(object sender, RoutedEventArgs e)
+        {
+            InstallMeOnStartUp();
+        }
+
+        void InstallMeOnStartUp()
+        {
+            try
+            {
+                Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                Assembly curAssembly = Assembly.GetExecutingAssembly();
+                if (chkStartUp.IsChecked.Value)
+                    key.SetValue(curAssembly.GetName().Name, curAssembly.Location);
+                else
+                    key.DeleteValue(curAssembly.GetName().Name, false);
+            }
+            catch { }
+        }
+
+        private void chkStartUp_Unchecked(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

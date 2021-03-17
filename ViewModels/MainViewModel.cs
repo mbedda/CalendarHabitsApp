@@ -13,11 +13,11 @@ namespace CalendarHabitsApp.ViewModels
 {
     public class MainViewModel : BindableBase
     {
-        private ObservableCollection<DateTime> _habitDays;
-        public ObservableCollection<DateTime> HabitDays
+        private Settings _settings;
+        public Settings Settings
         {
-            get { return _habitDays; }
-            set { SetProperty(ref _habitDays, value); }
+            get { return _settings; }
+            set { SetProperty(ref _settings, value); }
         }
 
         private ObservableCollection<MonthDay> _selectedMonthDays;
@@ -56,11 +56,7 @@ namespace CalendarHabitsApp.ViewModels
             RefreshTimer.Interval = TimeSpan.FromSeconds(5);
             RefreshTimer.Tick += RefreshTimer_Tick;
 
-            HabitDays = Common.LoadJson<ObservableCollection<DateTime>>(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab"));
-            if (HabitDays == null)
-            {
-                HabitDays = new ObservableCollection<DateTime>();
-            }
+            Settings = Common.LoadJson<Settings>(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab")); ;
 
             SelectedMonthDays = new ObservableCollection<MonthDay>();
 
@@ -99,7 +95,7 @@ namespace CalendarHabitsApp.ViewModels
                 {
                     bool habitCheck = false;
 
-                    var habitDay = HabitDays.ToList().FindIndex(s => s.ToString("MM/dd/yyyy") == indexedDay.ToString("MM/dd/yyyy"));
+                    var habitDay = Settings.HabitDays.ToList().FindIndex(s => s.ToString("MM/dd/yyyy") == indexedDay.ToString("MM/dd/yyyy"));
                     if (habitDay != -1)
                     {
                         habitCheck = true;
@@ -133,14 +129,14 @@ namespace CalendarHabitsApp.ViewModels
                 }
             }
 
-            Wallpaper.CreateCalendar(CurrentDate, CurrentDateCell, SelectedMonthDays.ToList(), HabitDays.ToList());
+            Wallpaper.CreateCalendar(Settings.DarkMode, CurrentDate, CurrentDateCell, SelectedMonthDays.ToList(), Settings.HabitDays.ToList());
 
             CurrentDate = DateTime.Now;
         }
 
         public void Save()
         {
-            Common.SaveJson(HabitDays, IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab"));
+            Common.SaveJson(Settings, IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab"));
         }
     }
 }
