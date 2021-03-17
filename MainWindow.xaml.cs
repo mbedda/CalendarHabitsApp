@@ -43,6 +43,13 @@ namespace CalendarHabitsApp
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             calendarInitComplete = true;
+
+            if (viewModel.Settings.StartMinimized)
+            {
+                ShowInTaskbar = false;
+                WindowState = WindowState.Minimized;
+            }
+
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -78,7 +85,7 @@ namespace CalendarHabitsApp
                 Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
                 Assembly curAssembly = Assembly.GetExecutingAssembly();
                 if (chkStartUp.IsChecked.Value)
-                    key.SetValue(curAssembly.GetName().Name, curAssembly.Location);
+                    key.SetValue(curAssembly.GetName().Name, curAssembly.Location.Replace(".dll", ".exe"));
                 else
                     key.DeleteValue(curAssembly.GetName().Name, false);
             }

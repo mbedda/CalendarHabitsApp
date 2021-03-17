@@ -22,6 +22,13 @@ namespace CalendarHabitsApp.Models
             set { SetProperty(ref _runOnStartup, value); }
         }
 
+        private bool _startMinimized;
+        public bool StartMinimized
+        {
+            get { return _startMinimized; }
+            set { SetProperty(ref _startMinimized, value); }
+        }
+
         private ObservableCollection<DateTime> _habitDays;
         public ObservableCollection<DateTime> HabitDays
         {

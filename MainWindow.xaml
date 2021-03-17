@@ -17,7 +17,8 @@
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal">
             <CheckBox IsChecked="{Binding Settings.DarkMode}" Margin="10">Dark mode</CheckBox>
             <CheckBox x:Name="chkStartUp" IsChecked="{Binding Settings.RunOnStartup}" Margin="10" Checked="chkStartUp_Checked" Unchecked="chkStartUp_Checked">Run on startup</CheckBox>
+            <CheckBox IsChecked="{Binding Settings.StartMinimized}" Margin="10">Start minimized</CheckBox>
         </StackPanel>
-        <Button Content="Update" Margin="10" HorizontalAlignment="Right" Grid.Row="1" Command="{Binding UpdateCommand}"></Button>
+        <Button Content="Update Wallpaper" Margin="10" HorizontalAlignment="Right" Grid.Row="1" Command="{Binding UpdateCommand}"></Button>
     </Grid>
 </Window>
