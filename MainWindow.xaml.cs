@@ -27,13 +27,21 @@ namespace CalendarHabitsApp
     public partial class MainWindow : Window
     {
         public MainViewModel viewModel;
-        public bool calendarInitComplete;
 
         public MainWindow()
         {
             viewModel = new MainViewModel();
 
-            calendarInitComplete = false;
+            viewModel.InitAsync().ContinueWith((t1) =>
+            {
+                if (viewModel.Settings.StartMinimized)
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        WindowState = WindowState.Minimized;
+                    });
+                }
+            });
 
             InitializeComponent();
 
@@ -42,14 +50,6 @@ namespace CalendarHabitsApp
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            calendarInitComplete = true;
-
-            if (viewModel.Settings.StartMinimized)
-            {
-                ShowInTaskbar = false;
-                WindowState = WindowState.Minimized;
-            }
-
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -62,13 +62,13 @@ namespace CalendarHabitsApp
             switch (this.WindowState)
             {
                 case WindowState.Maximized:
-                    Application.Current.MainWindow.ShowInTaskbar = true;
+                    ShowInTaskbar = true;
                     break;
                 case WindowState.Minimized:
-                    Application.Current.MainWindow.ShowInTaskbar = false;
+                    ShowInTaskbar = false;
                     break;
                 case WindowState.Normal:
-                    Application.Current.MainWindow.ShowInTaskbar = true;
+                    ShowInTaskbar = true;
                     break;
             }
         }
@@ -84,17 +84,18 @@ namespace CalendarHabitsApp
             {
                 Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
                 Assembly curAssembly = Assembly.GetExecutingAssembly();
+
+                string appPath = curAssembly.Location.Replace(".dll", ".exe");
+
+                if (viewModel.Settings.StartMinimized)
+                    appPath += " --start-minimized";
+
                 if (chkStartUp.IsChecked.Value)
-                    key.SetValue(curAssembly.GetName().Name, curAssembly.Location.Replace(".dll", ".exe"));
+                    key.SetValue(curAssembly.GetName().Name, appPath);
                 else
                     key.DeleteValue(curAssembly.GetName().Name, false);
             }
             catch { }
-        }
-
-        private void chkStartUp_Unchecked(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

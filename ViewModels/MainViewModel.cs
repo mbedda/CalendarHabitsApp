@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using IOPath = System.IO.Path;
 
@@ -40,10 +41,13 @@ namespace CalendarHabitsApp.ViewModels
 
         public DelegateCommand UpdateCommand { get; set; }
 
+        bool InitUpdate = false;
+
         public MainViewModel()
         {
             UpdateCommand = new DelegateCommand(Update);
-            Init();
+
+            //InitAsync();
         }
 
         private void Update()
@@ -51,28 +55,34 @@ namespace CalendarHabitsApp.ViewModels
             UpdateWallpaper();
         }
 
-        public void Init()
+        public async Task InitAsync()
         {
             RefreshTimer.Interval = TimeSpan.FromSeconds(5);
             RefreshTimer.Tick += RefreshTimer_Tick;
-
-            Settings = Common.LoadJson<Settings>(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab")); ;
 
             SelectedMonthDays = new ObservableCollection<MonthDay>();
 
             CurrentDate = DateTime.Now;
             CurrentDateCell = new CalendarCell();
+
+            Settings = await Task.Run(() => Common.LoadJson<Settings>(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab")));
+
+            if (Settings == null)
+                Settings = new Settings();
+
             FillSelectedMonthInfo();
 
-
-            UpdateWallpaper();
+            //UpdateWallpaper();
             RefreshTimer.Start();
         }
 
         private void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (CurrentDate.Day != DateTime.Now.Day)
+            if (!InitUpdate || CurrentDate.Day != DateTime.Now.Day)
+            {
                 UpdateWallpaper();
+                InitUpdate = true;
+            }
         }
 
         public void FillSelectedMonthInfo()
@@ -115,8 +125,10 @@ namespace CalendarHabitsApp.ViewModels
             }
         }
 
-        public void UpdateWallpaper()
+        public async Task UpdateWallpaper()
         {
+            CurrentDate = DateTime.Now;
+
             for (int i = 0; i < 5; i++)
             {
                 for (int j = 0; j < 7; j++)
@@ -129,9 +141,10 @@ namespace CalendarHabitsApp.ViewModels
                 }
             }
 
-            Wallpaper.CreateCalendar(Settings.DarkMode, CurrentDate, CurrentDateCell, SelectedMonthDays.ToList(), Settings.HabitDays.ToList());
+            await Task.Run(() => Wallpaper.CreateCalendar(Settings.DarkMode, CurrentDate, 
+                CurrentDateCell, SelectedMonthDays.ToList(), Settings.HabitDays.ToList()));
 
-            CurrentDate = DateTime.Now;
+            Wallpaper.Set(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.png"));
         }
 
         public void Save()

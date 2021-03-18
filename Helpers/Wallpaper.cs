@@ -52,8 +52,6 @@ namespace CalendarHabitsApp.Helpers
         public static void CreateCalendar(bool darkMode, DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
         {
             CreateImage(darkMode, currentDate, currentDateCell, selectedMonthDays, habitDays);
-
-            Set(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.png"));
         }
 
         public static void Set(string path)
