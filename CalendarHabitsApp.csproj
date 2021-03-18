@@ -7,10 +7,19 @@
     <ApplicationIcon>ch-icon4.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="Assets\base-dark.png" />
     <None Remove="Assets\base.png" />
-    <None Remove="Assets\highlight-border.png" />
     <None Remove="Assets\highlight-dark.png" />
     <None Remove="Assets\highlight.png" />
     <None Remove="Assets\numbers.png" />
@@ -52,9 +61,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\base.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\highlight-border.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\highlight-dark.png">

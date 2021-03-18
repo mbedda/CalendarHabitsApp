@@ -131,7 +131,6 @@ namespace CalendarHabitsApp.Helpers
                 ApplyKerning = true
             };
 
-            System.IO.Directory.CreateDirectory("output");
             using (Image<Rgba32> baseImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", baseImageFile))) // load up source images
             using (Image<Rgba32> highlightImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", highlightFile)))
             using (Image<Rgba32> crossoutImage = Image.Load<Rgba32>(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", crossoutFile)))
