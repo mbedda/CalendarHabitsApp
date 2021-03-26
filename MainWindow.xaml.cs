@@ -1,23 +1,8 @@
-﻿using CalendarHabitsApp.Helpers;
-using CalendarHabitsApp.Models;
-using CalendarHabitsApp.ViewModels;
+﻿using CalendarHabitsApp.ViewModels;
+using log4net;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace CalendarHabitsApp
 {
@@ -26,6 +11,8 @@ namespace CalendarHabitsApp
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public MainViewModel viewModel;
 
         public MainWindow()
@@ -87,8 +74,8 @@ namespace CalendarHabitsApp
 
                 string appPath = curAssembly.Location.Replace(".dll", ".exe");
 
-                if (viewModel.Settings.StartMinimized)
-                    appPath += " --start-minimized";
+                //if (viewModel.Settings.StartMinimized)
+                    //appPath += " --start-minimized";
 
                 if (chkStartUp.IsChecked.Value)
                     key.SetValue(curAssembly.GetName().Name, appPath);

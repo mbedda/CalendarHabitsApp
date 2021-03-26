@@ -22,19 +22,19 @@ namespace CalendarHabitsApp.Models
 
         public CalendarVariables()
         {
-            canvasStartX = 344;
-            canvasStartY = 145;
+            canvasStartX = 459;
+            canvasStartY = 151;
 
-            calendarCellW = 175;
-            calendarCellH = 176;
+            calendarCellW = 142;
+            calendarCellH = 142;
 
             calendarCellBorder = 1;
 
-            crossoutImageW = 109;
-            crossoutImageH = 104;
+            crossoutImageW = 88;
+            crossoutImageH = 84;
 
-            currentDayHighlightImageW = 140;
-            currentDayHighlightImageH = 140;
+            currentDayHighlightImageW = 112;
+            currentDayHighlightImageH = 112;
         }
     }
 }

@@ -28,6 +28,10 @@ namespace CalendarHabitsApp.UserControls
         private void Grid_MouseUp(object sender, MouseButtonEventArgs e)
         {
             MonthDay mDay = ((MonthDay)((Grid)sender).DataContext);
+
+            if (mDay.Date > DateTime.Now)
+                return;
+
             mDay.Checked = !mDay.Checked;
 
             MainWindow mainWindow = ((MainWindow)Application.Current.MainWindow);

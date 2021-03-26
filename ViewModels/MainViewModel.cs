@@ -1,5 +1,6 @@
 ﻿using CalendarHabitsApp.Helpers;
 using CalendarHabitsApp.Models;
+using log4net;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
@@ -41,10 +42,9 @@ namespace CalendarHabitsApp.ViewModels
 
         public DelegateCommand UpdateCommand { get; set; }
 
-        bool InitUpdate = false;
-
         public MainViewModel()
         {
+            log4net.Config.XmlConfigurator.Configure();
             UpdateCommand = new DelegateCommand(Update);
 
             //InitAsync();
@@ -57,7 +57,7 @@ namespace CalendarHabitsApp.ViewModels
 
         public async Task InitAsync()
         {
-            RefreshTimer.Interval = TimeSpan.FromSeconds(5);
+            RefreshTimer.Interval = TimeSpan.FromSeconds(10);
             RefreshTimer.Tick += RefreshTimer_Tick;
 
             SelectedMonthDays = new ObservableCollection<MonthDay>();
@@ -72,16 +72,15 @@ namespace CalendarHabitsApp.ViewModels
 
             FillSelectedMonthInfo();
 
-            //UpdateWallpaper();
+            Update();
             RefreshTimer.Start();
         }
 
         private void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (!InitUpdate || CurrentDate.Day != DateTime.Now.Day)
+            if (CurrentDate.Day != DateTime.Now.Day)
             {
-                UpdateWallpaper();
-                InitUpdate = true;
+                Update();
             }
         }
 
@@ -97,7 +96,7 @@ namespace CalendarHabitsApp.ViewModels
             }
 
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 List<int> colList = new List<int>();
 
@@ -127,9 +126,10 @@ namespace CalendarHabitsApp.ViewModels
 
         public async Task UpdateWallpaper()
         {
+            MainWindow.log.Info("Updating wallpaper - starting...");
             CurrentDate = DateTime.Now;
 
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 7; j++)
                 {

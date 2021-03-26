@@ -17,8 +17,8 @@
                     <ImageBrush ImageSource="/Assets/base.png" Stretch="UniformToFill"/>
                 </Grid.Background>
                 <!--<Image Source="pack://CalendarHabitsApp:,,,/Assets/base.png"></Image>-->
-                <ItemsControl Name="Calendar" ItemsSource="{Binding}" MaxWidth="1240" 
-                              VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,146,0,0">
+                <ItemsControl Name="Calendar" ItemsSource="{Binding}" MaxWidth="1004" 
+                              VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,151,0,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal" />
@@ -26,9 +26,9 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Width="176" Height="176" BorderThickness="1,1,1,1" BorderBrush="Transparent">
+                            <Border Width="142" Height="142" BorderThickness="1,1,1,1" BorderBrush="Transparent">
                                 <Grid>
-                                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="140" Height="140">
+                                    <Image HorizontalAlignment="Center" VerticalAlignment="Center" Width="112" Height="112">
                                         <Image.Style>
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
@@ -40,7 +40,7 @@
                                         </Image.Style>
                                     </Image>
                                     <TextBlock Text="{Binding Date.Day}" FontFamily="Old Standard TT Bold" 
-                                   FontSize="76" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                   FontSize="60" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Style.Triggers>
@@ -54,7 +54,7 @@
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
-                                    <Grid Width="109" Height="104" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" MouseUp="Grid_MouseUp">
+                                    <Grid Width="88" Height="84" VerticalAlignment="Center" HorizontalAlignment="Center" Cursor="Hand" MouseUp="Grid_MouseUp">
                                         <Grid.Background>
                                             <SolidColorBrush Color="#fffef0" Opacity=".01" />
                                         </Grid.Background>

@@ -56,6 +56,7 @@ namespace CalendarHabitsApp.Helpers
 
         public static void Set(string path)
         {
+            MainWindow.log.Info("Fetching desktop registry key");
             Style style = Wallpaper.Style.Centered;
             RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
 
@@ -67,7 +68,9 @@ namespace CalendarHabitsApp.Helpers
 
             if (style == Style.Centered)
             {
+                MainWindow.log.Info("Setting WallpaperStyle key value");
                 key.SetValue(@"WallpaperStyle", 1.ToString());
+                MainWindow.log.Info("Setting TileWallpaper key value");
                 key.SetValue(@"TileWallpaper", 0.ToString());
             }
 
@@ -77,14 +80,17 @@ namespace CalendarHabitsApp.Helpers
                 key.SetValue(@"TileWallpaper", 1.ToString());
             }
 
+            MainWindow.log.Info("Saving wallpaper path to registry - " + path);
             SystemParametersInfo(SPI_SETDESKWALLPAPER,
                 0,
                 path,
                 SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+            MainWindow.log.Info("Saving wallpaper complete");
         }
 
         public static void CreateImage(bool darkMode, DateTime currentDate, CalendarCell currentDateCell, List<MonthDay> selectedMonthDays, List<DateTime> habitDays)
         {
+            MainWindow.log.Info("Drawing calendar bitmap");
             Color color1, color2, color3;
             String baseImageFile, highlightFile, crossoutFile, crossoutDimmedFile;
 
@@ -113,20 +119,15 @@ namespace CalendarHabitsApp.Helpers
             //
             CalendarVariables calVars = new CalendarVariables();
 
-            int textw = 89;
-            int texth = 70;
+            int textw = 70;
+            int texth = 45;
 
             FontCollection collection = new FontCollection();
             FontFamily family = collection.Install(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "Fonts", "OldStandard-Bold.ttf"));
 
-            Font numbersFont = family.CreateFont(75, FontStyle.Italic);
-            RendererOptions numbersFontOptions = new RendererOptions(numbersFont, dpi: 72)
-            {
-                ApplyKerning = true
-            };
 
-            Font monthFont = family.CreateFont(242, FontStyle.Italic);
-            RendererOptions monthFontOptions = new RendererOptions(numbersFont, dpi: 72)
+            Font numbersFont = family.CreateFont(60, FontStyle.Italic);
+            RendererOptions numbersFontOptions = new RendererOptions(numbersFont, dpi: 72)
             {
                 ApplyKerning = true
             };
@@ -143,10 +144,11 @@ namespace CalendarHabitsApp.Helpers
                 Point highlightPosition = new Point(
                     calVars.canvasStartX + (currentDateCell.X - 1) * calVars.calendarCellW
                     + (currentDateCell.X * calVars.calendarCellBorder)
-                     + (calVars.calendarCellW / 2 - calVars.currentDayHighlightImageW / 2),
-                     calVars.canvasStartY + (currentDateCell.Y - 1) * calVars.calendarCellH
-                     + (currentDateCell.Y * calVars.calendarCellBorder)
-                     + (calVars.calendarCellH / 2 - calVars.currentDayHighlightImageH / 2));
+                    + (calVars.calendarCellW / 2 - calVars.currentDayHighlightImageW / 2),
+                     calVars.canvasStartY - 2 + ((currentDateCell.Y - 1) * calVars.calendarCellH)
+                    + (currentDateCell.Y * calVars.calendarCellBorder)
+                    + (calVars.calendarCellH / 2 - calVars.currentDayHighlightImageH / 2));
+                //Y calc -> (CanvasStart Y px + CurrentDayCell row number * cellheight) + (CurrentDayCell row number * border size) + (cellheight / 2 - imageheight / 2)
 
                 outputImage.Mutate(o => o
                     .DrawImage(baseImage, new Point(0, 0), 1f)
@@ -157,12 +159,12 @@ namespace CalendarHabitsApp.Helpers
                 #region Draw Calendar numbers
                 //Draw Calendar numbers
                 //
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 6; i++)
                 {
                     for (int j = 0; j < 7; j++)
                     {
                         float posx = calVars.canvasStartX + ((j + 1) - 1) * calVars.calendarCellW + ((j + 1) * calVars.calendarCellBorder) + (calVars.calendarCellW / 2 - textw / 2);
-                        float posy = calVars.canvasStartY - 15 + ((i + 1) - 1) * calVars.calendarCellH + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
+                        float posy = calVars.canvasStartY - 20 + (((i + 1) - 1) * calVars.calendarCellH) + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
 
                         Color textcolor = color1;
 
@@ -179,7 +181,7 @@ namespace CalendarHabitsApp.Helpers
                         if (habitDay != -1)
                         {
                             int posx2 = calVars.canvasStartX - 10 + ((j + 1) - 1) * calVars.calendarCellW + ((j + 1) * calVars.calendarCellBorder) + (calVars.calendarCellW / 2 - textw / 2);
-                            int posy2 = calVars.canvasStartY - 15 + ((i + 1) - 1) * calVars.calendarCellH + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
+                            int posy2 = calVars.canvasStartY - 22 + ((i + 1) - 1) * calVars.calendarCellH + ((i + 1) * calVars.calendarCellBorder) + (calVars.calendarCellH / 2 - texth / 2);
 
                             if (selectedMonthDays[(i * 7) + j].FromCurrentMonth)
                             {
@@ -205,11 +207,27 @@ namespace CalendarHabitsApp.Helpers
                 var textGraphicsOptions = new TextGraphicsOptions() // draw the text along the path wrapping at the end of the line
                 {
                     TextOptions = {
-                        WrapTextWidth = path.Length
+                        WrapTextWidth = path.Length,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     }
                 };
 
-                var glyphs = TextBuilder.GenerateGlyphs(Common.GetMonthNameFromNumber(currentDate.Month).ToUpper(), path, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
+                Font monthFontBase = family.CreateFont(242, FontStyle.Italic);
+                RendererOptions monthFontOptions = new RendererOptions(monthFontBase, dpi: 72)
+                {
+                    ApplyKerning = true
+                };
+
+                string MonthText = Common.GetMonthNameFromNumber(currentDate.Month).ToUpper();
+
+                // measure the text size
+                FontRectangle size = TextMeasurer.Measure(MonthText, new RendererOptions(monthFontBase));
+                int w = 934;
+                int h = 278;
+                float scalingFactor = Math.Min(w / size.Width, h / size.Height);
+                Font monthFont = new Font(monthFontBase, scalingFactor * monthFontBase.Size);
+
+                var glyphs = TextBuilder.GenerateGlyphs(MonthText, path, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
                 {
                     HorizontalAlignment = textGraphicsOptions.TextOptions.HorizontalAlignment,
                     TabWidth = textGraphicsOptions.TextOptions.TabWidth,
@@ -238,22 +256,37 @@ namespace CalendarHabitsApp.Helpers
                     }
                 };
 
-                var glyphs2 = TextBuilder.GenerateGlyphs(currentDate.Year.ToString(), path2, new RendererOptions(monthFont, textGraphicsOptions.TextOptions.DpiX, textGraphicsOptions.TextOptions.DpiY)
+                Font yearFont = family.CreateFont(242);
+                RendererOptions yearFontOptions = new RendererOptions(yearFont, dpi: 72)
                 {
-                    HorizontalAlignment = textGraphicsOptions.TextOptions.HorizontalAlignment,
-                    TabWidth = textGraphicsOptions.TextOptions.TabWidth,
-                    VerticalAlignment = textGraphicsOptions.TextOptions.VerticalAlignment,
-                    WrappingWidth = textGraphicsOptions.TextOptions.WrapTextWidth,
-                    ApplyKerning = textGraphicsOptions.TextOptions.ApplyKerning
+                    ApplyKerning = true
+                };
+
+                var glyphs2 = TextBuilder.GenerateGlyphs(currentDate.Year.ToString(), path2, new RendererOptions(yearFont, textGraphicsOptions2.TextOptions.DpiX, textGraphicsOptions2.TextOptions.DpiY)
+                {
+                    HorizontalAlignment = textGraphicsOptions2.TextOptions.HorizontalAlignment,
+                    TabWidth = textGraphicsOptions2.TextOptions.TabWidth,
+                    VerticalAlignment = textGraphicsOptions2.TextOptions.VerticalAlignment,
+                    WrappingWidth = textGraphicsOptions2.TextOptions.WrapTextWidth,
+                    ApplyKerning = textGraphicsOptions2.TextOptions.ApplyKerning
                 });
 
                 outputImage.Mutate(ctx => ctx
                     .Fill(color1, glyphs2));
                 #endregion
 
+                MainWindow.log.Info("Saving image as output.png");
                 //Save output image
                 //
-                outputImage.Save("output.png");
+                try
+                {
+                    outputImage.SaveAsPngAsync("output.png");
+                    MainWindow.log.Info("Image saved successfully");
+                }
+                catch (Exception e)
+                {
+                    MainWindow.log.Error(e.InnerException.Message);
+                }
             }
         }
     }
