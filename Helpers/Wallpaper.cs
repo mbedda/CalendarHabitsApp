@@ -280,7 +280,7 @@ namespace CalendarHabitsApp.Helpers
                 //
                 try
                 {
-                    outputImage.SaveAsPngAsync("output.png");
+                    outputImage.SaveAsPngAsync(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "output.png"));
                     MainWindow.log.Info("Image saved successfully");
                 }
                 catch (Exception e)
