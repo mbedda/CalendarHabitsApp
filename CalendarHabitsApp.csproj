@@ -21,6 +21,9 @@
   <ItemGroup>
     <None Remove="Assets\base-dark.png" />
     <None Remove="Assets\base.png" />
+    <None Remove="Assets\Fonts\OldStandard-Bold.ttf" />
+    <None Remove="Assets\Fonts\OldStandard-Italic.ttf" />
+    <None Remove="Assets\Fonts\OldStandard-Regular.ttf" />
     <None Remove="Assets\highlight-dark.png" />
     <None Remove="Assets\highlight.png" />
     <None Remove="Assets\numbers.png" />
@@ -43,15 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\Fonts\OldStandard-Bold.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Fonts\OldStandard-Italic.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Assets\Fonts\OldStandard-Regular.ttf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -66,6 +60,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\base.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\OldStandard-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\OldStandard-Italic.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Fonts\OldStandard-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\highlight-dark.png">

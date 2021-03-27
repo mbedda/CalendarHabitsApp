@@ -39,7 +39,7 @@
                                             </Style>
                                         </Image.Style>
                                     </Image>
-                                    <TextBlock Text="{Binding Date.Day}" FontFamily="Old Standard TT Bold" 
+                                    <TextBlock Text="{Binding Date.Day}" FontFamily="{StaticResource OldStandard}" FontWeight="Bold"
                                    FontSize="60" HorizontalAlignment="Center" VerticalAlignment="Center">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
@@ -91,7 +91,7 @@
                             <RotateTransform Angle="-90" />
                         </TransformGroup>
                     </Grid.LayoutTransform>
-                    <TextBlock Text="MARCH" FontSize="242" FontFamily="Old Standard TT Bold" Foreground="#1f1f1f" 
+                    <TextBlock Text="MARCH" FontSize="242" FontFamily="{StaticResource OldStandard}" FontWeight="Bold" Foreground="#1f1f1f" 
                            VerticalAlignment="Center" HorizontalAlignment="Right">
                     </TextBlock>
                 </Grid>
@@ -101,7 +101,7 @@
                             <RotateTransform Angle="90" />
                         </TransformGroup>
                     </Grid.LayoutTransform>
-                    <TextBlock Text="2021" FontSize="242" FontFamily="Old Standard TT Bold" Foreground="#1f1f1f">
+                    <TextBlock Text="2021" FontSize="242" FontFamily="{StaticResource OldStandard}" FontWeight="Bold" Foreground="#1f1f1f">
                     </TextBlock>
                 </Grid>
             </Grid>
