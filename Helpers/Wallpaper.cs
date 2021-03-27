@@ -122,8 +122,8 @@ namespace CalendarHabitsApp.Helpers
             int textw = 70;
             int texth = 45;
 
-            FontCollection collection = new FontCollection();
-            FontFamily family = collection.Install(IOPath.Combine("Assets", "Fonts", "OldStandard-Bold.ttf"));
+            FontCollection collection = new FontCollection(); 
+            FontFamily family = collection.Install(IOPath.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "Fonts", "OldStandard-Bold.ttf"));
 
 
             Font numbersFont = family.CreateFont(60, FontStyle.Italic);
