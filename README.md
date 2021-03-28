@@ -7,7 +7,7 @@
 
 Keep track of your habits on your desktop wallpaper
 
-# Features
+## Features
 - Set your desktop wallpaper to the current month calendar
 - Cross out habit completed days on your calendar and it would automatically update on your desktop
 - Runs lightly in the background
