@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace CalendarHabitsApp.Models
@@ -29,6 +30,13 @@ namespace CalendarHabitsApp.Models
             set { SetProperty(ref _startMinimized, value); }
         }
 
+        private bool _pauseWallpaperUpdate;
+        public bool PauseWallpaperUpdate
+        {
+            get { return _pauseWallpaperUpdate; }
+            set { SetProperty(ref _pauseWallpaperUpdate, value); }
+        }
+
         private ObservableCollection<DateTime> _habitDays;
         public ObservableCollection<DateTime> HabitDays
         {
@@ -36,9 +44,27 @@ namespace CalendarHabitsApp.Models
             set { SetProperty(ref _habitDays, value); }
         }
 
+        private DateTime _currentDate;
+        [IgnoreDataMember]
+        public DateTime CurrentDate
+        {
+            get { return _currentDate; }
+            set { SetProperty(ref _currentDate, value); }
+        }
+
+        private ObservableCollection<MonthDay> _selectedMonthDays;
+        [IgnoreDataMember]
+        public ObservableCollection<MonthDay> SelectedMonthDays
+        {
+            get { return _selectedMonthDays; }
+            set { SetProperty(ref _selectedMonthDays, value); }
+        }
+
         public Settings()
         {
             HabitDays = new ObservableCollection<DateTime>();
+            SelectedMonthDays = new ObservableCollection<MonthDay>();
+            CurrentDate = DateTime.Now;
         }
     }
 }

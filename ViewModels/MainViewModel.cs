@@ -22,25 +22,15 @@ namespace CalendarHabitsApp.ViewModels
             set { SetProperty(ref _settings, value); }
         }
 
-        private ObservableCollection<MonthDay> _selectedMonthDays;
-        public ObservableCollection<MonthDay> SelectedMonthDays
-        {
-            get { return _selectedMonthDays; }
-            set { SetProperty(ref _selectedMonthDays, value); }
-        }
-
-        private DateTime _currentDate;
-        public DateTime CurrentDate
-        {
-            get { return _currentDate; }
-            set { SetProperty(ref _currentDate, value); }
-        }
-
         public CalendarCell CurrentDateCell { get; set; }
 
         DispatcherTimer RefreshTimer = new DispatcherTimer();
+        DispatcherTimer AutoSaveTimer = new DispatcherTimer();
 
         public DelegateCommand UpdateCommand { get; set; }
+
+        string DataPath = IOPath.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Calendar Habits", "hbts.calhab");
+        public bool DataChanged = false;
 
         public MainViewModel()
         {
@@ -60,15 +50,18 @@ namespace CalendarHabitsApp.ViewModels
             RefreshTimer.Interval = TimeSpan.FromSeconds(10);
             RefreshTimer.Tick += RefreshTimer_Tick;
 
-            SelectedMonthDays = new ObservableCollection<MonthDay>();
+            AutoSaveTimer.Interval = TimeSpan.FromSeconds(5);
+            AutoSaveTimer.Tick += AutoSaveTimer_Tick;
 
-            CurrentDate = DateTime.Now;
             CurrentDateCell = new CalendarCell();
 
-            Settings = await Task.Run(() => Common.LoadJson<Settings>(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab")));
+            Settings = await Task.Run(() => Common.LoadJson<Settings>(DataPath));
 
             if (Settings == null)
                 Settings = new Settings();
+
+            Settings.PropertyChanged += Settings_PropertyChanged;
+            Settings.HabitDays.CollectionChanged += HabitDays_CollectionChanged;
 
             FillSelectedMonthInfo();
 
@@ -76,9 +69,27 @@ namespace CalendarHabitsApp.ViewModels
             RefreshTimer.Start();
         }
 
+        private void HabitDays_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            Settings_PropertyChanged(sender, null);
+        }
+
+        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            DataChanged = true;
+            AutoSaveTimer.Stop();
+            AutoSaveTimer.Start();
+        }
+
+        private void AutoSaveTimer_Tick(object sender, EventArgs e)
+        {
+            Save();
+            AutoSaveTimer.Stop();
+        }
+
         private void RefreshTimer_Tick(object sender, EventArgs e)
         {
-            if (CurrentDate.Day != DateTime.Now.Day)
+            if (Settings.CurrentDate.ToString("MM/dd/yyyy") != DateTime.Now.ToString("MM/dd/yyyy"))
             {
                 Update();
             }
@@ -110,13 +121,13 @@ namespace CalendarHabitsApp.ViewModels
                         habitCheck = true;
                     }
 
-                    if (indexedDay.Month != CurrentDate.Month)
+                    if (indexedDay.Month != Settings.CurrentDate.Month)
                     {
-                        SelectedMonthDays.Add(new MonthDay() { Date = indexedDay, FromCurrentMonth = false, Checked = habitCheck });
+                        Settings.SelectedMonthDays.Add(new MonthDay() { Date = indexedDay, FromCurrentMonth = false, Checked = habitCheck });
                     }
                     else
                     {
-                        SelectedMonthDays.Add(new MonthDay() { Date = indexedDay, FromCurrentMonth = true, Checked = habitCheck });
+                        Settings.SelectedMonthDays.Add(new MonthDay() { Date = indexedDay, FromCurrentMonth = true, Checked = habitCheck });
                     }
 
                     indexedDay = indexedDay.AddDays(1);
@@ -126,14 +137,19 @@ namespace CalendarHabitsApp.ViewModels
 
         public async Task UpdateWallpaper()
         {
+            if (Settings.PauseWallpaperUpdate)
+            {
+                return;
+            }
+
             MainWindow.log.Info("Updating wallpaper - starting...");
-            CurrentDate = DateTime.Now;
+            Settings.CurrentDate = DateTime.Now;
 
             for (int i = 0; i < 6; i++)
             {
                 for (int j = 0; j < 7; j++)
                 {
-                    if (SelectedMonthDays[(i * 7) + j].Date.ToString("MM/dd/yyyy") == CurrentDate.ToString("MM/dd/yyyy"))
+                    if (Settings.SelectedMonthDays[(i * 7) + j].Date.ToString("MM/dd/yyyy") == Settings.CurrentDate.ToString("MM/dd/yyyy"))
                     {
                         CurrentDateCell.X = j + 1;
                         CurrentDateCell.Y = i + 1;
@@ -141,15 +157,21 @@ namespace CalendarHabitsApp.ViewModels
                 }
             }
 
-            await Task.Run(() => Wallpaper.CreateCalendar(Settings.DarkMode, CurrentDate, 
-                CurrentDateCell, SelectedMonthDays.ToList(), Settings.HabitDays.ToList()));
+            await Task.Run(() => Wallpaper.CreateCalendar(Settings.DarkMode, Settings.CurrentDate, 
+                CurrentDateCell, Settings.SelectedMonthDays.ToList(), Settings.HabitDays.ToList()));
 
             Wallpaper.Set(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.png"));
         }
 
         public void Save()
         {
-            Common.SaveJson(Settings, IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "hbts.calhab"));
+            if (DataChanged)
+            {
+                Common.SaveJson(Settings, DataPath);
+                DataChanged = false;
+                UpdateWallpaper();
+                Console.WriteLine("Data saved");
+            }
         }
     }
 }

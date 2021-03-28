@@ -54,6 +54,7 @@ namespace CalendarHabitsApp
                     ShowInTaskbar = true;
                     break;
                 case WindowState.Minimized:
+                    Hide();
                     ShowInTaskbar = false;
                     break;
                 case WindowState.Normal:

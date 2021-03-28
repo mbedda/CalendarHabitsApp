@@ -17,7 +17,7 @@
                     <ImageBrush ImageSource="/Assets/base.png" Stretch="UniformToFill"/>
                 </Grid.Background>
                 <!--<Image Source="pack://CalendarHabitsApp:,,,/Assets/base.png"></Image>-->
-                <ItemsControl Name="Calendar" ItemsSource="{Binding}" MaxWidth="1004" 
+                <ItemsControl Name="Calendar" ItemsSource="{Binding SelectedMonthDays}" MaxWidth="1004" 
                               VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,151,0,0">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -32,7 +32,13 @@
                                         <Image.Style>
                                             <Style TargetType="Image">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Date, Converter={StaticResource IsCurrentDateConverter}}" Value="True">
+                                                    <DataTrigger Value="True">
+                                                        <DataTrigger.Binding>
+                                                            <MultiBinding Converter="{StaticResource IsCurrentDateConverter}" UpdateSourceTrigger="PropertyChanged">
+                                                                <Binding Path="Date"/>
+                                                                <Binding Path="DataContext.CurrentDate" ElementName="customCalendar"/>
+                                                            </MultiBinding>
+                                                        </DataTrigger.Binding>
                                                         <Setter Property="Source" Value="/Assets/highlight.png" />
                                                     </DataTrigger>
                                                 </Style.Triggers>

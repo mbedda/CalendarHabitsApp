@@ -48,6 +48,7 @@ namespace CalendarHabitsApp
 
         public void ShowWindow()
         {
+            Application.Current.MainWindow.Show();
             Application.Current.MainWindow.WindowState = WindowState.Normal;
             Application.Current.MainWindow.ShowInTaskbar = true;
             Application.Current.MainWindow.Topmost = true;  // important
