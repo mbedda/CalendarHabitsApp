@@ -91,19 +91,24 @@ namespace CalendarHabitsApp.ViewModels
         {
             if (Settings.CurrentDate.ToString("MM/dd/yyyy") != DateTime.Now.ToString("MM/dd/yyyy"))
             {
+                if (Settings.CurrentDate.Month != DateTime.Now.Month)
+                {
+                    Settings.CurrentDate = DateTime.Now;
+                    FillSelectedMonthInfo();
+                }
+
                 Update();
             }
         }
 
         public void FillSelectedMonthInfo()
         {
+            Settings.SelectedMonthDays = new ObservableCollection<MonthDay>();
             DateTime indexedDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            int tmpdec = 0;
 
             while (!indexedDay.DayOfWeek.Equals(DayOfWeek.Sunday))
             {
-                tmpdec--;
-                indexedDay = indexedDay.AddDays(tmpdec);
+                indexedDay = indexedDay.AddDays(-1);
             }
 
 
@@ -157,7 +162,7 @@ namespace CalendarHabitsApp.ViewModels
                 }
             }
 
-            await Task.Run(() => Wallpaper.CreateCalendar(Settings.DarkMode, Settings.CurrentDate, 
+            await Task.Run(() => Wallpaper.CreateCalendar(Settings.DarkMode, Settings.CurrentDate,
                 CurrentDateCell, Settings.SelectedMonthDays.ToList(), Settings.HabitDays.ToList()));
 
             Wallpaper.Set(IOPath.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.png"));

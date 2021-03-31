@@ -1,7 +1,7 @@
 ﻿<Application x:Class="CalendarHabitsApp.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:CalendarHabitsApp">
+             xmlns:local="clr-namespace:CalendarHabitsApp" xmlns:Converters="clr-namespace:CalendarHabitsApp.Converters">
     <Application.Resources>
         <!-- merge NotifyIcon and related stuff into the application -->
         <ResourceDictionary>
@@ -10,6 +10,9 @@
             </ResourceDictionary.MergedDictionaries>
 
             <FontFamily x:Key="OldStandard">/Assets/Fonts/#Old Standard TT</FontFamily>
+            
+            <Converters:CaseConverter x:Key="CaseConverterToUpper" Case="Upper"/>
+            <Converters:CaseConverter x:Key="CaseConverterToLower" Case="Lower"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
