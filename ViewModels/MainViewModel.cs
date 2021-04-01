@@ -91,7 +91,7 @@ namespace CalendarHabitsApp.ViewModels
         {
             if (Settings.CurrentDate.ToString("MM/dd/yyyy") != DateTime.Now.ToString("MM/dd/yyyy"))
             {
-                if (Settings.CurrentDate.Month != DateTime.Now.Month)
+                if (Settings.CurrentDate.Month != DateTime.Now.Month || Settings.CurrentDate.Year != DateTime.Now.Year)
                 {
                     Settings.CurrentDate = DateTime.Now;
                     FillSelectedMonthInfo();
